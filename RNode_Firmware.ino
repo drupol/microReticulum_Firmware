@@ -2749,9 +2749,18 @@ void loop() {
   }
 
   if (power_management_enabled && (millis() - last_activity_time > idle_timeout_ms)) {
+    if (!is_light_sleep) {
+      INFO("Entering light sleep due to inactivity...");
+      is_light_sleep = true;
+    }
     #if MCU_VARIANT == MCU_ESP32 || MCU_VARIANT == MCU_NRF52
       delay(50); // Yield to RTOS idle task for power saving (Light Sleep)
     #endif
+  } else {
+    if (is_light_sleep) {
+      INFO("Waking up from light sleep.");
+      is_light_sleep = false;
+    }
   }
 }
 

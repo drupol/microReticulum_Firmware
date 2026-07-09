@@ -310,6 +310,7 @@ void measure_battery() {
     }
 
     if (power_management_enabled && battery_ready && battery_installed && battery_voltage > 1.0 && battery_voltage < BAT_V_MIN) {
+      INFO("Battery critical! Entering deep sleep to protect cell.");
       sleep_now();
     }
 
@@ -366,6 +367,7 @@ void measure_battery() {
       battery_ready = true;
 
       if (power_management_enabled && !external_power && battery_installed && battery_voltage > 1.0 && battery_voltage < BAT_V_MIN) {
+        INFO("Battery critical! Entering deep sleep to protect cell.");
         sleep_now();
       }
 
