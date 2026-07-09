@@ -234,6 +234,9 @@
     bool eeprom_ok = false;
     bool firmware_update_mode = false;
     bool serial_in_frame = false;
+    bool power_management_enabled = true;
+    unsigned long idle_timeout_ms = 15000;
+    volatile unsigned long last_activity_time = 0;
 
 	// Boot flags
 	#define START_FROM_BOOTLOADER 0x01

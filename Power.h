@@ -194,6 +194,7 @@ bool bat_diff_positive = false;
 #define PMU_SCV_RESET_INTERVAL 3
 void kiss_indicate_battery();
 void kiss_indicate_temperature();
+void sleep_now();
 
 void measure_temperature() {
   #if PLATFORM == PLATFORM_ESP32
@@ -308,6 +309,10 @@ void measure_battery() {
       // }
     }
 
+    if (power_management_enabled && battery_ready && battery_installed && battery_voltage > 1.0 && battery_voltage < BAT_V_MIN) {
+      sleep_now();
+    }
+
   #elif BOARD_MODEL == BOARD_TBEAM || BOARD_MODEL == BOARD_TBEAM_S_V1
     if (PMU) {
       float discharge_current = 0;
@@ -359,6 +364,10 @@ void measure_battery() {
       float ext_watts       = ext_voltage*(ext_current/1000.0);
 
       battery_ready = true;
+
+      if (power_management_enabled && !external_power && battery_installed && battery_voltage > 1.0 && battery_voltage < BAT_V_MIN) {
+        sleep_now();
+      }
 
       // if (bt_state == BT_STATE_CONNECTED) {
       //   if (battery_installed) {

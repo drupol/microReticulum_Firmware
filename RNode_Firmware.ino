@@ -1203,6 +1203,7 @@ inline void getPacketData(uint16_t len) {
 }
 
 void ISR_VECT receive_callback(int packet_size) {
+  last_activity_time = millis();
   #if MCU_VARIANT == MCU_ESP32 || MCU_VARIANT == MCU_NRF52
     BaseType_t int_mask;
   #endif
@@ -2746,6 +2747,12 @@ void loop() {
       kiss_indicate_error(ERROR_MEMORY_LOW); memory_low = false;
     #endif
   }
+
+  if (power_management_enabled && (millis() - last_activity_time > idle_timeout_ms)) {
+    #if MCU_VARIANT == MCU_ESP32 || MCU_VARIANT == MCU_NRF52
+      delay(50); // Yield to RTOS idle task for power saving (Light Sleep)
+    #endif
+  }
 }
 
 void sleep_now() {
@@ -2797,6 +2804,7 @@ void sleep_now() {
 }
 
 void button_event(uint8_t event, unsigned long duration) {
+  last_activity_time = millis();
   #if MCU_VARIANT == MCU_ESP32 || MCU_VARIANT == MCU_NRF52 || MCU_VARIANT == MCU_NATIVE
     if (display_blanked) {
       display_unblank();
@@ -2858,6 +2866,7 @@ void serial_poll() {
 void buffer_serial() {
   if (!serial_buffering) {
     serial_buffering = true;
+    last_activity_time = millis();
 
     uint8_t c = 0;
 
